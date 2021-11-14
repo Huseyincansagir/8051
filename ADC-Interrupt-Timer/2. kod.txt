@@ -1,0 +1,68 @@
+# include "aduc841.h"
+	org 0000h
+	sjmp basla
+	org 001Bh
+	sjmp timerkesme
+	org 0033h
+	sjmp adck
+basla:
+	setb et1
+	setb ea
+	setb EADC
+	mov tmod ,#10h
+	mov tl1,#00h
+	mov th1,#28h	
+	setb tr1
+dongu:
+	sjmp dongu
+y:	mov adccon1,#8Ch
+	mov adccon2,#01h
+	setb sconv
+	setb 00h 
+	mov 26h,#00h
+	reti
+x:	
+	reti
+adck:
+	;Bitsel düzenlemeler
+	mov a,ADCDATAH
+	anl a,#00001111b ;ADCDATAH ' in ilk nibbli
+	swap a
+	mov r0,a
+	mov a,ADCDATAL
+	anl a,#11110000b ;ADCDATAL ' in son nibbli
+	swap a
+	add a,r0
+	
+	jnb 00h , z	
+	mov 31h,a
+	
+	cjne a,30h,v 
+	mov 32h,#0AAh
+	reti
+	z:	
+	mov 30h,a
+	reti
+	v:
+	mov 32h,#0ffh
+	reti
+timerkesme:
+	mov tl1,#00h
+	mov th1,#28h
+	inc r7
+	cjne r7,#0c8h,second
+	inc 26h
+	mov r7,#00h
+	mov a,#01h
+	subb a,26h
+	jc y
+	clr 00h
+	mov adccon1,#8Ch
+	mov adccon2,#00h
+	setb sconv
+	reti
+
+second:
+	reti
+	
+end

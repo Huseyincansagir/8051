@@ -1,0 +1,4 @@
+".\Objects\3 4.obj" 
+TO ".\Objects\3 2" 
+
+PRINT(".\Listings\3 2.map")

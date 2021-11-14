@@ -1,0 +1,85 @@
+#include <ADUC841.H>
+
+org 000
+sjmp main
+org  0003h
+sjmp kesme
+
+
+
+main:
+;ayarlar bölümü
+ mov r0,#08h
+  setb ex0
+  setb ea
+  setb it0
+  clr ie0
+  mov sp,#99h  ; üstüne yazma islemi oldugundan dolayi uzakta random bir deger verilmistir
+  mov adccon1,#10001100b
+  
+ adcal:
+	jb p3.0 , diger
+	
+	mov adccon1,#10001100b
+	mov adccon2,#00000000b ;clr cs0
+	
+	sjmp alindi;Bu asamada ADCON2 nin ilk 4 biti 0 dir yani adc0 seçilmistir. Eger p3.0 butonuna basilirsa p3.0 temizlenir ve bu adc0 in secilecegi durumdur.
+ diger:	
+	jb p3.1 , adcal
+	
+	mov adccon1,#10001100b
+	mov adccon2,#00000001b;setb cs0
+	
+	
+ alindi:	
+ 
+
+
+  
+  
+  
+  
+  
+  jb p3.6 , atla    ;p3.6 setlenmis ise yani basilmamissa kodlaru çalistirmaz.
+  
+  setb SCONV
+  k:	jnb ADCI,k   ;Analog deger okunana kadar beklenir.
+  ACALL altprogram
+  ;clr ADCI           ;Kesme kullanilmadigi için sifirlanmalidir.
+  atla:
+ sjmp main
+  
+  
+  altprogram:
+   mov 01h,ADCDATAL
+  mov 02h,ADCDATAH
+  mov A,ADCDATAH
+  ANL A,#11110000b
+  swap A
+  mov 3h,A
+  mov A,ADCDATAL
+  
+  SUBB A , 04h   ;adcdatalh-ref
+  jc buyukesit
+  mov @r0 , #0Bh  ;ADCDATALH < REF
+  inc r0
+  buyukesit:
+  mov @r0 , #0Ah  ;ADCDATALH >= REF
+  
+  ret
+  
+  kesme:
+  mov 04h , p2
+  reti
+  
+
+end
+	
+	
+	
+	
+	
+	
+	
+	
+	

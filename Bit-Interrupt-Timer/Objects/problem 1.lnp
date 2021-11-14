@@ -1,0 +1,4 @@
+".\Objects\problem 1.obj" 
+TO ".\Objects\problem 1" 
+
+PRINT(".\Listings\problem 1.map")
